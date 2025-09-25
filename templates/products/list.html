@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Products · Flask CRUD{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h3 mb-0">Products</h1>
+  <a href="{{ url_for('create_product') }}" class="btn btn-primary">Add Product</a>
+</div>
+
+<form class="row g-2 mb-3" method="get">
+  <div class="col-sm-8 col-md-6">
+    <input type="search" name="q" value="{{ search_term }}" class="form-control" placeholder="Search by name or description">
+  </div>
+  <div class="col-auto">
+    <select class="form-select" name="sort">
+      <option value="created_at" {% if sort == 'created_at' %}selected{% endif %}>Newest</option>
+      <option value="name" {% if sort == 'name' %}selected{% endif %}>Name</option>
+      <option value="price" {% if sort == 'price' %}selected{% endif %}>Price</option>
+      <option value="stock" {% if sort == 'stock' %}selected{% endif %}>Stock</option>
+    </select>
+  </div>
+  <div class="col-auto">
+    <select class="form-select" name="order">
+      <option value="desc" {% if order == 'desc' %}selected{% endif %}>Desc</option>
+      <option value="asc" {% if order == 'asc' %}selected{% endif %}>Asc</option>
+    </select>
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-outline-secondary" type="submit">Apply</button>
+  </div>
+</form>
+
+{% if products %}
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+    {% for p in products %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        {% if p.image_url %}
+        <img src="{{ p.image_url }}" class="card-img-top object-fit-cover" style="height: 180px;" alt="{{ p.name }}">
+        {% endif %}
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title mb-1">{{ p.name }}</h5>
+          <div class="text-muted small mb-2">Added {{ p.created_at.strftime('%Y-%m-%d') }}</div>
+          <p class="card-text flex-grow-1">{{ p.description[:140] }}{% if p.description and p.description|length > 140 %}…{% endif %}</p>
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="fw-semibold">${{ '%.2f'|format(p.price) }}</div>
+            <div class="text-muted">Stock: {{ p.stock }}</div>
+          </div>
+        </div>
+        <div class="card-footer bg-white border-0 d-flex gap-2">
+          <a href="{{ url_for('view_product', product_id=p.id) }}" class="btn btn-sm btn-outline-secondary">View</a>
+          <a href="{{ url_for('edit_product', product_id=p.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+          <form action="" method="post" onsubmit="return confirm('Delete this product?');" class="ms-auto">
+            <input type="hidden" name="_method" value="DELETE">
+          </form>
+          <form action="{{ url_for('delete_product', product_id=p.id) }}" method="post" class="ms-auto" onsubmit="return confirm('Delete this product?');">
+            {{ csrf_token() }}
+            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center text-muted py-5">No products found.</div>
+{% endif %}
+{% endblock %}

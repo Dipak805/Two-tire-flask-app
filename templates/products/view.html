@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} · Flask CRUD{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h3 mb-0">{{ product.name }}</h1>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-primary">Edit</a>
+    <a href="{{ url_for('list_products') }}" class="btn btn-outline-secondary">Back</a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    {% if product.image_url %}
+    <img src="{{ product.image_url }}" class="img-fluid rounded shadow-sm" alt="{{ product.name }}">
+    {% else %}
+    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 320px;">
+      <div class="text-muted">No image</div>
+    </div>
+    {% endif %}
+  </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Details</h5>
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Price</dt>
+          <dd class="col-sm-8">${{ '%.2f'|format(product.price) }}</dd>
+          <dt class="col-sm-4">Stock</dt>
+          <dd class="col-sm-8">{{ product.stock }}</dd>
+          <dt class="col-sm-4">Added</dt>
+          <dd class="col-sm-8">{{ product.created_at.strftime('%Y-%m-%d %H:%M') }}</dd>
+        </dl>
+        {% if product.description %}
+        <hr>
+        <div>
+          <h6>Description</h6>
+          <p class="mb-0">{{ product.description }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
